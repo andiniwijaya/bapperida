@@ -1,0 +1,84 @@
+@layer components {
+    .auth-layout {
+        @apply min-h-svh bg-white antialiased dark:bg-navy-900;
+    }
+
+    .auth-layout__grid {
+        @apply grid min-h-svh lg:grid-cols-2;
+    }
+
+    .auth-branding {
+        @apply relative hidden overflow-hidden lg:flex lg:items-center lg:justify-center;
+    }
+
+    .auth-branding--mobile {
+        @apply relative mb-8 flex w-full flex-col items-center overflow-hidden text-center lg:hidden;
+    }
+
+    .auth-branding__background {
+        @apply absolute inset-0 bg-cover bg-center bg-no-repeat;
+        background-image: var(--auth-bg-image);
+    }
+
+    .auth-branding__overlay {
+        @apply absolute inset-0 bg-ocean-900/70;
+    }
+
+    .auth-branding__content {
+        @apply relative z-10 flex max-w-lg flex-col items-center gap-8 px-6 py-10 text-center text-white/85 sm:px-10;
+    }
+
+    .auth-branding--mobile .auth-branding__content {
+        @apply w-full gap-4 py-8;
+    }
+
+    .auth-branding__logos {
+        @apply flex items-center gap-3 transition-opacity hover:opacity-90 sm:gap-4;
+    }
+
+    .auth-branding__logo-kab {
+        @apply h-12 w-auto object-contain sm:h-14;
+    }
+
+    .auth-branding__logo-bapperida {
+        @apply h-14 w-auto object-contain sm:h-16;
+    }
+
+    .auth-branding__title {
+        @apply font-heading text-2xl font-semibold leading-snug text-white/85 sm:text-3xl;
+    }
+
+    .auth-branding__subtitle {
+        @apply text-sm leading-relaxed text-white/85 sm:text-base;
+    }
+
+    .auth-form-panel {
+        @apply flex flex-col items-center justify-center px-4 py-10 sm:px-6 lg:px-12;
+    }
+
+    .auth-form-panel__inner {
+        @apply w-full max-w-md;
+        animation: auth-fade-in 0.5s ease-out forwards;
+    }
+
+    .auth-form-panel__copyright {
+        @apply mt-6 text-center text-xs text-charcoal-500 dark:text-slate-500;
+    }
+
+    .auth-input-icon {
+        @apply pointer-events-none absolute inset-y-0 left-0 z-[1] flex items-center pl-3;
+        color: var(--ds-text-muted);
+    }
+}
+
+@keyframes auth-fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

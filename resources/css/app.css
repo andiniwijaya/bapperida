@@ -1,0 +1,253 @@
+@import 'tailwindcss';
+@import './landing.css';
+@import './auth.css';
+@import './design-system.css';
+@import './app-layout.css';
+@import '../../vendor/livewire/flux/dist/flux.css';
+
+@source '../views';
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../vendor/livewire/flux-pro/stubs/**/*.blade.php';
+@source '../../vendor/livewire/flux/stubs/**/*.blade.php';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+    --font-sans: 'Source Sans Pro', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-heading: 'Playfair Display', ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
+
+    /* Deep Ocean Blue — primary */
+    --color-ocean-50: #e8f1f8;
+    --color-ocean-100: #c5dced;
+    --color-ocean-200: #9ec5df;
+    --color-ocean-300: #6fa8c8;
+    --color-ocean-400: #4a8fb5;
+    --color-ocean-500: #2d76a0;
+    --color-ocean-600: #1f5f85;
+    --color-ocean-700: #164a6b;
+    --color-ocean-800: #0f3550;
+    --color-ocean-900: #0a2540;
+
+    /* Gold — accent */
+    --color-gold-50: #fdf8e8;
+    --color-gold-100: #f9ecd0;
+    --color-gold-200: #f2d9a3;
+    --color-gold-300: #e8c476;
+    --color-gold-400: #dbb04d;
+    --color-gold-500: #c9a227;
+    --color-gold-600: #a8861f;
+    --color-gold-700: #876919;
+    --color-gold-800: #664d13;
+    --color-gold-900: #45330d;
+
+    /* Maroon — secondary */
+    --color-maroon-50: #f5e8eb;
+    --color-maroon-100: #e8cdd4;
+    --color-maroon-200: #d4a3b0;
+    --color-maroon-300: #b87a8c;
+    --color-maroon-400: #9c5a6e;
+    --color-maroon-500: #7b3f52;
+    --color-maroon-600: #652f42;
+    --color-maroon-700: #4f2433;
+    --color-maroon-800: #3a1a25;
+    --color-maroon-900: #251117;
+
+    /* Navy — dark mode surfaces */
+    --color-navy-50: #e9edf2;
+    --color-navy-100: #d1d9e3;
+    --color-navy-200: #a8b8c9;
+    --color-navy-300: #7a94ad;
+    --color-navy-400: #567694;
+    --color-navy-500: #3d5a78;
+    --color-navy-600: #2f4760;
+    --color-navy-700: #243548;
+    --color-navy-800: #1a2635;
+    --color-navy-900: #111a24;
+
+    /* Charcoal — body text */
+    --color-charcoal-50: #f4f5f6;
+    --color-charcoal-100: #e3e5e7;
+    --color-charcoal-200: #c8ccd0;
+    --color-charcoal-300: #a8adb3;
+    --color-charcoal-400: #848a91;
+    --color-charcoal-500: #6b7178;
+    --color-charcoal-600: #565c63;
+    --color-charcoal-700: #454a50;
+    --color-charcoal-800: #36454f;
+    --color-charcoal-900: #2a3339;
+
+    --color-primary-50: var(--color-ocean-50);
+    --color-primary-100: var(--color-ocean-100);
+    --color-primary-200: var(--color-ocean-200);
+    --color-primary-300: var(--color-ocean-300);
+    --color-primary-400: var(--color-ocean-400);
+    --color-primary-500: var(--color-ocean-500);
+    --color-primary-600: var(--color-ocean-600);
+    --color-primary-700: var(--color-ocean-700);
+    --color-primary-800: var(--color-ocean-800);
+    --color-primary-900: var(--color-ocean-900);
+
+    --color-accent: var(--color-ocean-800);
+    --color-accent-content: var(--color-ocean-800);
+    --color-accent-foreground: var(--color-white);
+
+    --color-zinc-50: #fafafa;
+    --color-zinc-100: #f5f5f5;
+    --color-zinc-200: #e5e5e5;
+    --color-zinc-300: #d4d4d4;
+    --color-zinc-400: #a3a3a3;
+    --color-zinc-500: #737373;
+    --color-zinc-600: #525252;
+    --color-zinc-700: #404040;
+    --color-zinc-800: #262626;
+    --color-zinc-900: #171717;
+    --color-zinc-950: #0a0a0a;
+}
+
+@layer theme {
+    .dark {
+        --color-accent: var(--color-gold-500);
+        --color-accent-content: var(--color-gold-500);
+        --color-accent-foreground: var(--color-navy-900);
+    }
+}
+
+@layer base {
+    *,
+    ::after,
+    ::before,
+    ::backdrop,
+    ::file-selector-button {
+        border-color: var(--color-charcoal-200, currentColor);
+    }
+
+    html {
+        @apply scroll-smooth;
+    }
+
+    body {
+        @apply font-sans antialiased;
+        background-color: var(--color-background);
+        color: var(--ds-text-body);
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        font-family: var(--font-heading);
+        @apply font-semibold tracking-tight;
+        color: var(--ds-text-heading);
+    }
+}
+
+@layer utilities {
+    .font-heading {
+        font-family: var(--font-heading);
+    }
+
+    .animate-fade-in {
+        animation: fade-in 0.5s ease-out forwards;
+    }
+
+    .animate-fade-in-up {
+        animation: fade-in-up 0.6s ease-out forwards;
+    }
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fade-in-up {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+[x-cloak] {
+    display: none !important;
+}
+
+[data-flux-field]:not(ui-radio, ui-checkbox) {
+    @apply grid gap-2;
+}
+
+[data-flux-label] {
+    @apply !mb-0 !leading-tight;
+}
+
+input:focus[data-flux-control],
+textarea:focus[data-flux-control],
+select:focus[data-flux-control] {
+    @apply outline-hidden ring-2 ring-offset-2;
+    --tw-ring-color: var(--ds-focus-ring);
+    --tw-ring-offset-color: var(--ds-focus-ring-offset);
+}
+
+/* Overrides after Flux — settings nav & chrome dropdowns */
+.app-settings-nav [data-flux-navlist] [data-flux-navlist-item] {
+    color: var(--ds-text-body);
+    font-weight: 500;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.app-settings-nav [data-flux-navlist] [data-flux-navlist-item]:hover {
+    background-color: var(--color-ocean-50);
+    color: var(--color-ocean-800);
+}
+
+.dark .app-settings-nav [data-flux-navlist] [data-flux-navlist-item]:hover {
+    background-color: rgba(15, 53, 80, 0.45);
+    color: var(--color-gold-400);
+}
+
+.app-settings-nav [data-flux-navlist] [data-flux-navlist-item][data-current] {
+    background-color: var(--color-ocean-50);
+    color: var(--color-ocean-800);
+    font-weight: 600;
+}
+
+.dark .app-settings-nav [data-flux-navlist] [data-flux-navlist-item][data-current] {
+    background-color: rgba(15, 53, 80, 0.55);
+    color: var(--color-gold-400);
+}
+
+/* Flux form controls — align with design system (especially dark mode) */
+[data-flux-label] {
+    color: var(--ds-text-body) !important;
+}
+
+.dark [data-flux-control]:not([type='file']) {
+    background-color: var(--ds-surface) !important;
+    border-color: var(--ds-border-strong) !important;
+    color: var(--ds-text-body) !important;
+    color-scheme: dark;
+}
+
+.dark [data-flux-control]::placeholder {
+    color: var(--ds-input-placeholder) !important;
+}
+
+.dark [data-flux-control]:disabled {
+    background-color: var(--ds-input-disabled-bg) !important;
+    color: var(--ds-text-muted) !important;
+}
+
+[data-flux-control]:not([type='file']) {
+    color-scheme: light;
+}

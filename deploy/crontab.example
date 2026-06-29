@@ -1,0 +1,4 @@
+# Cron Laravel Scheduler — jalankan setiap menit
+# Ganti /var/www/bapperida dengan path instalasi aplikasi
+
+* * * * * cd /var/www/bapperida && php artisan schedule:run >> /dev/null 2>&1

@@ -1,0 +1,56 @@
+<?php
+
+namespace App\Http\Requests\Api;
+
+use App\Models\Report;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
+
+/**
+ * Validates filters for report statistics API.
+ *
+ * Business rules:
+ * - department_id must reference an active, non-deleted department when provided.
+ * - period_start/end define inclusive date bounds; granularity drives period grouping.
+ *
+ * Related modules: ReportStatisticsService, ReportController (statistics endpoint).
+ * Dashboard: DashboardService consumes the same statistics service with compatible filters.
+ */
+class ReportStatisticsRequest extends FormRequest
+{
+    /**
+     * Requires viewAny permission on Report marker model.
+     */
+    public function authorize(): bool
+    {
+        return $this->user()?->can('viewAny', Report::class) ?? false;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function rules(): array
+    {
+        return [
+            'department_id' => [
+                'nullable',
+                'integer',
+                Rule::exists('departments', 'id')
+                    ->whereNull('deleted_at')
+                    ->where('is_active', true),
+            ],
+            'user_id' => [
+                'nullable',
+                'integer',
+                Rule::exists('users', 'id')->whereNull('deleted_at'),
+            ],
+            'year' => ['nullable', 'integer', 'digits:4'],
+            'month' => ['nullable', 'integer', 'min:1', 'max:12'],
+            'period_start' => ['nullable', 'date'],
+            'period_end' => ['nullable', 'date', 'after_or_equal:period_start'],
+            'status' => ['nullable', 'string', Rule::in(['active', 'inactive'])],
+            'letter_type' => ['nullable', 'string', Rule::in(array_keys(config('letter.types')))],
+            'granularity' => ['nullable', 'string', Rule::in(['day', 'week', 'month', 'year'])],
+        ];
+    }
+}
