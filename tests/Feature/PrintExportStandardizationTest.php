@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Department;
 use App\Models\User;
 use App\Support\RegistrationCardPrint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -31,7 +32,7 @@ class PrintExportStandardizationTest extends TestCase
     public function test_registration_print_page_includes_card_dimensions_and_template_options(): void
     {
         $user = User::factory()->create(['role' => 'staff']);
-        $department = \App\Models\Department::factory()->create(['is_active' => true]);
+        $department = Department::factory()->create(['is_active' => true]);
         $this->createLetterNumberRegistration($user, $department);
 
         $response = $this->actingAs($user)
@@ -40,14 +41,16 @@ class PrintExportStandardizationTest extends TestCase
         $response->assertOk();
         $response->assertSee('163mm', false);
         $response->assertSee('103mm', false);
-        $response->assertSeeText('KARTU SURAT KELUAR');
+        $response->assertSee('card-frame-table', false);
+        $response->assertSee('card-grid-table', false);
+        $response->assertSee('card-layout-table', false);
         $response->assertSeeText('Indeks :');
     }
 
     public function test_registration_data_only_print_has_no_template_chrome(): void
     {
         $user = User::factory()->create(['role' => 'staff']);
-        $department = \App\Models\Department::factory()->create(['is_active' => true]);
+        $department = Department::factory()->create(['is_active' => true]);
         $this->createLetterNumberRegistration($user, $department);
 
         $response = $this->actingAs($user)
@@ -61,7 +64,7 @@ class PrintExportStandardizationTest extends TestCase
     public function test_incoming_letter_print_uses_official_report_header_and_title(): void
     {
         $user = User::factory()->create(['role' => 'staff']);
-        $department = \App\Models\Department::factory()->create(['is_active' => true]);
+        $department = Department::factory()->create(['is_active' => true]);
         $letter = $this->createIncomingLetter($user, $department);
 
         $response = $this->actingAs($user)

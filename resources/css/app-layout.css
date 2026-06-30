@@ -750,6 +750,7 @@
     vertical-align: middle;
     border-bottom: 1px solid var(--color-charcoal-100);
     border-right: 1px solid var(--color-charcoal-100);
+    transition: background-color 0.15s ease;
 }
 
 .dark .app-data-table tbody td {
@@ -767,11 +768,7 @@
 }
 
 .app-data-table tbody tr:hover td {
-    background-color: rgba(232, 241, 248, 0.55);
-}
-
-.dark .app-data-table tbody tr:hover td {
-    background-color: rgba(10, 37, 64, 0.35);
+    background-color: var(--ds-table-row-hover);
 }
 
 .app-table-toolbar__select {

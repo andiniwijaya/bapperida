@@ -1,18 +1,18 @@
 <?php
 
+use App\Http\Controllers\Api\ActivityLog\ActivityLogController;
 use App\Http\Controllers\Api\Auth\AuthController;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\Registration\RegistrationApprovalController;
+use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\Department\DepartmentController;
-use App\Http\Controllers\Api\User\UserController;
 use App\Http\Controllers\Api\IncomingLetterController;
 use App\Http\Controllers\Api\LetterNumberRegistrationController;
-use App\Http\Controllers\Api\OutgoingLetterController;
-use App\Http\Controllers\Api\ActivityLog\ActivityLogController;
-use App\Http\Controllers\Api\DashboardController;
-use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\OutgoingLetterController;
+use App\Http\Controllers\Api\Registration\RegistrationApprovalController;
+use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\SystemSetting\SystemSettingController;
+use App\Http\Controllers\Api\User\UserController;
+use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->group(function () {
 
@@ -112,11 +112,6 @@ Route::middleware([
     Route::get(
         'letter-number-registrations/preview',
         [LetterNumberRegistrationController::class, 'preview']
-    );
-
-    Route::get(
-        'letter-number-registrations/available-sequences',
-        [LetterNumberRegistrationController::class, 'availableSequences']
     );
 
     Route::get(

@@ -3,7 +3,6 @@
 namespace App\Services\LetterNumberRegistration;
 
 use App\Models\Department;
-use App\Models\LetterNumberRegistration;
 use App\Services\SystemSetting\LetterNumberFormatter;
 use App\Services\SystemSetting\SystemConfigurationService;
 use Illuminate\Validation\ValidationException;
@@ -13,8 +12,8 @@ use Illuminate\Validation\ValidationException;
  *
  * Business rules:
  * - Format driven by system_settings.letter_number_template via SystemConfigurationService.
- * - Auto-selects next gap in sequence when sequence_number omitted.
- * - Active year and start number come from system configuration.
+ * - sequence_number is supplied manually by the user.
+ * - Active year comes from system configuration when omitted.
  *
  * Configuration impact: letter number format changes apply without code deploy.
  */
@@ -30,7 +29,7 @@ class PreviewLetterNumberService
      *
      * @param  string  $letterCode  Letter type/code segment.
      * @param  int  $departmentId  Active department primary key.
-     * @param  int|null  $sequenceNumber  Explicit sequence or null for next available.
+     * @param  int  $sequenceNumber  User-supplied sequence for the year.
      * @param  int|null  $year  Calendar year; defaults to configured active year.
      * @return array{sequence_number: int, letter_number: string}
      *
@@ -39,7 +38,7 @@ class PreviewLetterNumberService
     public function handle(
         string $letterCode,
         int $departmentId,
-        ?int $sequenceNumber = null,
+        int $sequenceNumber,
         ?int $year = null,
     ): array {
         $year ??= $this->configuration->activeYear();
@@ -56,8 +55,6 @@ class PreviewLetterNumberService
             ]);
         }
 
-        $sequenceNumber ??= $this->nextAvailableSequenceNumber($year);
-
         $letterNumber = $this->formatter->format(
             $this->configuration->letterNumberTemplate(),
             [
@@ -73,32 +70,5 @@ class PreviewLetterNumberService
             'sequence_number' => $sequenceNumber,
             'letter_number' => $letterNumber,
         ];
-    }
-
-    /**
-     * Find the lowest unused sequence number for the given year (gap-fill algorithm).
-     *
-     * @param  int  $year  Calendar year to scan.
-     * @return int Next available sequence starting from configured letter_start_number.
-     */
-    private function nextAvailableSequenceNumber(int $year): int
-    {
-        $usedSequenceNumbers = LetterNumberRegistration::query()
-            ->where('year', $year)
-            ->orderBy('sequence_number')
-            ->pluck('sequence_number')
-            ->toArray();
-
-        $next = $this->configuration->letterStartNumber();
-
-        foreach ($usedSequenceNumbers as $sequenceNumber) {
-            if ($sequenceNumber !== $next) {
-                return $next;
-            }
-
-            $next++;
-        }
-
-        return $next;
     }
 }

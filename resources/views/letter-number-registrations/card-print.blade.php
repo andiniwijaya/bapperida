@@ -7,20 +7,58 @@
     <title>Cetak Kartu Surat Keluar</title>
     <style>
         @page {
-            size: 163mm 103mm landscape;
+            size: 462.047pt 292.064pt;
             margin: 0;
         }
+
+        @if ($pdfMode ?? false)
+        html,
+        body {
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow: hidden;
+            line-height: 0;
+            font-size: 0;
+        }
+
+        .cards-preview {
+            margin: 0 !important;
+            padding: 0 !important;
+            line-height: 0;
+            font-size: 0;
+        }
+
+        .card-page {
+            width: 163mm;
+            height: 103mm;
+            margin: 0 !important;
+            padding: 0;
+            box-shadow: none;
+            page-break-inside: avoid;
+            overflow: hidden;
+            line-height: 0;
+            font-size: 0;
+        }
+
+        .card-page + .card-page {
+            page-break-before: always;
+        }
+        @endif
 
         * {
             box-sizing: border-box;
         }
 
+        html,
         body {
             margin: 0;
             padding: 0;
+        }
+
+        body {
             font-family: 'Times New Roman', Times, serif;
-            color: #000;
-            background: #e5e7eb;
+            color: #000000;
+            background: {{ ($pdfMode ?? false) ? '#ffffff' : '#e5e7eb' }};
         }
 
         .screen-toolbar {
@@ -35,7 +73,7 @@
             gap: 12px;
             align-items: center;
             justify-content: space-between;
-            background: #fff;
+            background: #ffffff;
             border: 1px solid #d1d5db;
             border-radius: 12px;
             padding: 16px;
@@ -66,7 +104,7 @@
             padding: 8px 14px;
             border-radius: 8px;
             border: 1px solid #cbd5e1;
-            background: #fff;
+            background: #ffffff;
             color: #111827;
             text-decoration: none;
             font-size: 0.875rem;
@@ -76,20 +114,65 @@
         .btn-primary {
             background: #0f3550;
             border-color: #0f3550;
-            color: #fff;
+            color: #ffffff;
         }
 
         .cards-preview {
             max-width: 960px;
             margin: 0 auto;
-            padding: 0 16px 24px;
+            padding: {{ ($pdfMode ?? false) ? '0' : '0 16px 24px' }};
         }
 
         .card-page {
             width: 163mm;
             height: 103mm;
-            margin: 0 auto 16px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+            margin: {{ ($pdfMode ?? false) ? '0' : '0 auto 16px' }};
+            padding: 0;
+            box-shadow: {{ ($pdfMode ?? false) ? 'none' : '0 2px 8px rgba(0, 0, 0, 0.12)' }};
+            overflow: hidden;
+            page-break-inside: avoid;
+            line-height: 0;
+            background: #ffffff;
+        }
+
+        .card-page + .card-page {
+            page-break-before: always;
+        }
+
+        .card-frame-table,
+        .card-layout-table,
+        .card-grid-table {
+            border-collapse: collapse;
+            border-spacing: 0;
+            table-layout: fixed;
+            page-break-inside: avoid;
+            margin: 0;
+            padding: 0;
+        }
+
+        .card-grid-table {
+            line-height: normal;
+            font-size: 9pt;
+        }
+
+        .card-sidebar-cell {
+            overflow: hidden;
+            padding: 0;
+            margin: 0;
+        }
+
+        .card-sidebar-text {
+            display: inline-block;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 9.5pt;
+            font-weight: bold;
+            color: #ffffff;
+            letter-spacing: 0.06em;
+            white-space: nowrap;
+            line-height: 1;
+            -webkit-transform: rotate(-90deg);
+            transform: rotate(-90deg);
+            transform-origin: center center;
         }
 
         .empty-state {
@@ -100,8 +183,17 @@
         }
 
         @media print {
+            @page {
+                size: 163mm 103mm;
+                margin: 0;
+            }
+
+            html,
             body {
-                background: #fff;
+                margin: 0;
+                padding: 0;
+                background: #ffffff;
+                line-height: 0;
             }
 
             .no-print {
@@ -110,17 +202,25 @@
 
             .cards-preview {
                 padding: 0;
+                margin: 0;
                 max-width: none;
+                line-height: 0;
             }
 
             .card-page {
+                width: 163mm;
+                height: 103mm;
                 margin: 0;
+                padding: 0;
                 box-shadow: none;
-                page-break-after: always;
+                page-break-inside: avoid;
+                overflow: hidden;
+                line-height: 0;
+                font-size: 0;
             }
 
-            .card-page:last-child {
-                page-break-after: auto;
+            .card-page + .card-page {
+                page-break-before: always;
             }
         }
     </style>

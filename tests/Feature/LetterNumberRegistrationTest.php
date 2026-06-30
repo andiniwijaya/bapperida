@@ -62,6 +62,35 @@ class LetterNumberRegistrationTest extends TestCase
             ->assertJsonValidationErrors(['sequence_number']);
     }
 
+    public function test_same_sequence_number_is_allowed_for_different_years(): void
+    {
+        $user = User::factory()->create(['role' => 'staff']);
+        $department = $this->department();
+
+        $this->createRegistration($user, $department, 2026, 1);
+
+        $payload = $this->payload($department);
+        $payload['year'] = 2027;
+        $payload['sequence_number'] = 1;
+
+        $this->actingAs($user, 'sanctum')
+            ->postJson('/api/letter-number-registrations', $payload)
+            ->assertCreated()
+            ->assertJsonPath('data.sequence_number', 1)
+            ->assertJsonPath('data.year', 2027);
+    }
+
+    public function test_preview_requires_sequence_number(): void
+    {
+        $user = User::factory()->create(['role' => 'staff']);
+        $department = $this->department();
+
+        $this->actingAs($user, 'sanctum')
+            ->getJson("/api/letter-number-registrations/preview?letter_code=TEST&department_id={$department->id}&year=2026")
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['sequence_number']);
+    }
+
     public function test_store_does_not_allow_status_mass_assignment(): void
     {
         $user = User::factory()->create(['role' => 'staff']);
@@ -150,7 +179,10 @@ class LetterNumberRegistrationTest extends TestCase
 
         $response->assertOk();
         $response->assertSeeText('Cetak Kartu Surat Keluar');
-        $response->assertSeeText('KARTU SURAT KELUAR');
+        $response->assertSee('card-frame-table', false);
+        $response->assertSee('card-grid-table', false);
+        $response->assertSee('card-layout-table', false);
+        $response->assertSee('#c62828', false);
         $response->assertSeeText('Indeks :');
         $response->assertSeeText('IDX-001');
         $response->assertSeeText('Surat Uji');
@@ -183,6 +215,11 @@ class LetterNumberRegistrationTest extends TestCase
         $response->assertOk();
         $response->assertHeader('content-type', 'application/pdf');
         $response->assertHeader('content-disposition');
+        $this->assertSame(
+            1,
+            preg_match_all('/\/Type\s*\/Page(?!s)/', $response->getContent()),
+            'Expected exactly one PDF page per exported registration card.',
+        );
     }
 
     /**
@@ -220,10 +257,10 @@ class LetterNumberRegistrationTest extends TestCase
                 'data' => [
                     'departments',
                     'letter_types',
-                    'available_sequences',
                     'current_year',
                 ],
             ]);
+        $response->assertJsonMissingPath('data.available_sequences');
     }
 
     public function test_filters_api_returns_dropdown_data_in_envelope(): void
@@ -242,6 +279,19 @@ class LetterNumberRegistrationTest extends TestCase
                     'statuses',
                 ],
             ]);
+    }
+
+    public function test_create_form_includes_manual_sequence_number_field(): void
+    {
+        $user = User::factory()->create(['role' => 'staff', 'status' => 'active']);
+
+        $response = $this->actingAs($user)
+            ->get(route('letter-number-registrations.create'));
+
+        $response->assertOk();
+        $response->assertSee('id="sequence_number"', false);
+        $response->assertSee('type="number"', false);
+        $response->assertSee('Nomor Urut', false);
     }
 
     public function test_create_form_includes_letter_date_field(): void
@@ -264,14 +314,20 @@ class LetterNumberRegistrationTest extends TestCase
         ]);
     }
 
-    private function createRegistration(User $user, Department $department): LetterNumberRegistration
-    {
+    private function createRegistration(
+        User $user,
+        Department $department,
+        int $year = 2026,
+        int $sequenceNumber = 1,
+    ): LetterNumberRegistration {
+        $sequence = str_pad((string) $sequenceNumber, 3, '0', STR_PAD_LEFT);
+
         $registration = new LetterNumberRegistration([
             'index_code' => 'IDX-001',
             'letter_code' => 'TEST',
-            'sequence_number' => 1,
-            'year' => 2026,
-            'letter_number' => 'TEST/001/DPT/2026',
+            'sequence_number' => $sequenceNumber,
+            'year' => $year,
+            'letter_number' => "TEST/{$sequence}/DPT/{$year}",
             'subject' => 'Surat Uji',
             'summary' => 'Ringkasan uji',
             'recipient' => 'Direktur',

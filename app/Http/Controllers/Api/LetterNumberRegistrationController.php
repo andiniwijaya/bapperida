@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Api\ApiController;
 use App\Http\Requests\LetterNumberRegistration\FilterLetterNumberRegistrationRequest;
 use App\Http\Requests\LetterNumberRegistration\PreviewLetterNumberRequest;
 use App\Http\Requests\LetterNumberRegistration\StoreLetterNumberRegistrationRequest;
@@ -10,10 +9,10 @@ use App\Http\Requests\LetterNumberRegistration\UpdateLetterNumberRegistrationReq
 use App\Http\Resources\LetterNumberRegistrationResource;
 use App\Models\Department;
 use App\Models\LetterNumberRegistration;
-use App\Services\LetterNumberRegistration\AvailableSequenceService;
 use App\Services\LetterNumberRegistration\DeleteLetterNumberRegistrationService;
 use App\Services\LetterNumberRegistration\ListLetterNumberRegistrationService;
 use App\Services\LetterNumberRegistration\PreviewLetterNumberService;
+use App\Services\LetterNumberRegistration\RestoreLetterNumberRegistrationService;
 use App\Services\LetterNumberRegistration\StoreLetterNumberRegistrationService;
 use App\Services\LetterNumberRegistration\UpdateLetterNumberRegistrationService;
 use App\Services\SystemSetting\SystemConfigurationService;
@@ -25,7 +24,7 @@ use Illuminate\Http\Request;
  *
  * Business rules:
  * - All authenticated roles may view/create; update/delete follow role-based policy.
- * - Preview and available-sequences assist form UX before store.
+ * - Preview assists form UX before store.
  * - create/filters endpoints supply metadata for frontend forms.
  *
  * Related modules: LetterNumberRegistration (model, services, policy), Department, OutgoingLetter.
@@ -176,12 +175,11 @@ class LetterNumberRegistrationController extends ApiController
      * Restore a soft-deleted registration after sequence uniqueness checks.
      *
      * @param  int  $id  Trashed registration primary key.
-     * @param  \App\Services\LetterNumberRegistration\RestoreLetterNumberRegistrationService  $service
      * @return JsonResponse Restored LetterNumberRegistrationResource.
      */
     public function restore(
         int $id,
-        \App\Services\LetterNumberRegistration\RestoreLetterNumberRegistrationService $service
+        RestoreLetterNumberRegistrationService $service
     ): JsonResponse {
         $registration = LetterNumberRegistration::onlyTrashed()->findOrFail($id);
 
@@ -214,31 +212,10 @@ class LetterNumberRegistrationController extends ApiController
             $service->handle(
                 letterCode: $request->string('letter_code')->toString(),
                 departmentId: $request->integer('department_id'),
-                sequenceNumber: $request->integer('sequence_number') ?: null,
+                sequenceNumber: $request->integer('sequence_number'),
                 year: $request->integer('year') ?: null,
             ),
             'Preview generated successfully.'
-        );
-    }
-
-    /**
-     * List unused sequence numbers for a given year (form helper).
-     *
-     * @param  Request  $request  Optional year query parameter.
-     * @param  AvailableSequenceService  $service  Gap detection in sequence usage.
-     * @return JsonResponse Array of available sequence integers.
-     */
-    public function availableSequences(
-        Request $request,
-        AvailableSequenceService $service
-    ): JsonResponse {
-        $this->authorize('create', LetterNumberRegistration::class);
-
-        return $this->success(
-            $service->handle(
-                $request->integer('year') ?: null
-            ),
-            'Available sequences retrieved successfully.'
         );
     }
 
@@ -294,15 +271,13 @@ class LetterNumberRegistrationController extends ApiController
     }
 
     /**
-     * Metadata for the create form (departments, types, available sequences).
+     * Metadata for the create form (departments, types, configuration).
      *
      * @param  Request  $request  Optional year override.
-     * @param  AvailableSequenceService  $availableSequenceService  Sequence gap helper.
      * @return JsonResponse Form initialization payload.
      */
     public function create(
         Request $request,
-        AvailableSequenceService $availableSequenceService,
         SystemConfigurationService $configuration,
     ): JsonResponse {
         $this->authorize('create', LetterNumberRegistration::class);
@@ -331,12 +306,10 @@ class LetterNumberRegistrationController extends ApiController
             'active_year' => $configuration->activeYear(),
             'letter_number_template' => $configuration->letterNumberTemplate(),
             'letter_prefix' => $configuration->letterPrefix(),
-            'letter_start_number' => $configuration->letterStartNumber(),
             'default_letter_type' => $configuration->defaultLetterType(),
             'default_letter_priority' => $configuration->defaultLetterPriority(),
             'departments' => $departments,
             'letter_types' => $letterTypes,
-            'available_sequences' => $availableSequenceService->handle($year),
         ], 'Letter registration create metadata retrieved successfully.');
     }
 }

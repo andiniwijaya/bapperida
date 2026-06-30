@@ -2,6 +2,7 @@
 
 namespace App\Services\LetterNumberRegistration;
 
+use App\Models\LetterNumberRegistration;
 use App\Services\ActivityLog\RecordActivityLogService;
 use App\Support\RegistrationCardPrint;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -16,7 +17,7 @@ class ExportLetterNumberRegistrationPdfService
     public function __construct(private RecordActivityLogService $activityLog) {}
 
     /**
-     * @param  Collection<int, \App\Models\LetterNumberRegistration>  $registrations
+     * @param  Collection<int, LetterNumberRegistration>  $registrations
      */
     public function handle(
         Collection $registrations,
@@ -45,7 +46,7 @@ class ExportLetterNumberRegistrationPdfService
             'layoutLabel' => RegistrationCardPrint::layoutOptions()[$layout],
             'backgroundLabel' => RegistrationCardPrint::backgroundOptions()[$background],
             'pdfMode' => true,
-        ])->setPaper(RegistrationCardPrint::cardPaperSize(), 'landscape');
+        ])->setPaper(RegistrationCardPrint::cardPaperSize());
 
         return $pdf->download($fileName);
     }

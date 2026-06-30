@@ -253,7 +253,7 @@ function rowTemplate(registration, index) {
     const canDelete = registration.can?.delete;
 
     return `
-        <tr class="border-b hover:bg-slate-50">
+        <tr class="border-b">
             <td class="px-4 py-3 text-center">
                 <input data-row-checkbox data-id="${registration.id}" type="checkbox" class="rounded border-slate-300">
             </td>

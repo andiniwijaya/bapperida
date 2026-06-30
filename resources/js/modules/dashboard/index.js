@@ -560,7 +560,7 @@ function buildActivityLogSection(data) {
         ? rows
               .map(
                   (cells) => `
-            <tr class="border-b border-charcoal-100 last:border-none transition hover:bg-ocean-50/50 dark:border-navy-700 dark:hover:bg-navy-900/40">
+            <tr class="border-b border-charcoal-100 last:border-none dark:border-navy-700">
                 ${cells
                     .map(
                         (cell) =>
@@ -709,7 +709,7 @@ function buildTableSection(title, description, headers, rows, colSpan, emptyMess
         ? rows
               .map(
                   (cells) => `
-            <tr class="border-b border-charcoal-100 last:border-none transition hover:bg-ocean-50/50 dark:border-navy-700 dark:hover:bg-navy-900/40">
+            <tr class="border-b border-charcoal-100 last:border-none dark:border-navy-700">
                 ${cells
                     .map(
                         (cell) =>

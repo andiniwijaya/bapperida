@@ -53,13 +53,15 @@
                 />
             </div>
             <div class="col-span-12 md:col-span-4">
-                <x-select
+                <x-input
                     id="sequence_number"
                     name="sequence_number"
+                    type="number"
                     label="Nomor Urut"
-                    placeholder="Pilih nomor urut..."
-                    searchable
-                    tooltip="Nomor urut menentukan urutan penomoran surat dalam tahun yang sama."
+                    placeholder="Masukkan nomor urut..."
+                    min="1"
+                    step="1"
+                    tooltip="Nomor urut unik per tahun. Ditampilkan tiga digit pada nomor surat (001, 002, dst.)."
                     required
                 />
             </div>

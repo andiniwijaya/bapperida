@@ -141,7 +141,7 @@ function rowTemplate(department, index) {
           : dsBadgeClass("neutral");
 
     return `
-        <tr class="hover:bg-ocean-50/50 dark:hover:bg-navy-900/40">
+        <tr>
             <td class="px-3 py-3 text-center text-sm">${index + 1}</td>
             <td class="px-5 py-3 text-sm font-medium">${department.code}</td>
             <td class="px-5 py-3 text-sm">${department.name}</td>

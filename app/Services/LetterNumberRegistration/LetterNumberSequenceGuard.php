@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 /**
- * Concurrency and uniqueness guard for letter number sequence allocation.
+ * Concurrency and uniqueness guard for manual letter number sequence validation.
  *
  * Business rules:
  * - MySQL: GET_LOCK per calendar year during store/update/restore.
@@ -42,7 +42,6 @@ class LetterNumberSequenceGuard
      *
      * @param  int  $year  Lock namespace year.
      * @param  callable  $callback  Atomic registration logic.
-     * @return mixed
      */
     private function withMysqlYearLock(int $year, callable $callback): mixed
     {

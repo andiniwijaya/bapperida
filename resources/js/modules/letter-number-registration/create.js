@@ -14,22 +14,17 @@ import {
 const registrationForm = document.getElementById("registrationForm");
 const letterCodeInput = document.getElementById("letter_code");
 const departmentSelect = document.getElementById("department_id");
-const sequenceSelect = document.getElementById("sequence_number");
+const sequenceInput = document.getElementById("sequence_number");
 const yearInput = document.getElementById("year");
 const previewInput = document.getElementById("letter_number_preview");
 const submitButton = registrationForm?.querySelector("button[type=submit]");
-
-let availableLetterTypes = [];
 
 document.addEventListener("DOMContentLoaded", loadForm);
 registrationForm?.addEventListener("submit", submitForm);
 letterCodeInput?.addEventListener("change", previewLetterNumber);
 departmentSelect?.addEventListener("change", previewLetterNumber);
-sequenceSelect?.addEventListener("change", previewLetterNumber);
-yearInput?.addEventListener("change", async () => {
-    await loadSequenceNumbers();
-    await previewLetterNumber();
-});
+sequenceInput?.addEventListener("input", previewLetterNumber);
+yearInput?.addEventListener("change", previewLetterNumber);
 
 async function loadForm() {
     try {
@@ -40,7 +35,6 @@ async function loadForm() {
 
         populateDepartments(payload.departments ?? []);
         populateLetterTypes(payload.letter_types ?? []);
-        await loadSequenceNumbers(payload.available_sequences);
 
         if (payload.current_year) {
             yearInput.value = payload.current_year;
@@ -81,8 +75,6 @@ function populateLetterTypes(types) {
         return;
     }
 
-    availableLetterTypes = types;
-
     populateSelect(letterTypeSelect, [
         { value: "", label: "Pilih jenis surat..." },
         ...types.map((type) => ({
@@ -92,33 +84,10 @@ function populateLetterTypes(types) {
     ]);
 }
 
-async function loadSequenceNumbers(numbers = null) {
-    if (!sequenceSelect) {
-        return;
-    }
-
-    const year = yearInput?.value || new Date().getFullYear();
-
-    if (!numbers) {
-        const response = await get(
-            `/api/letter-number-registrations/available-sequences?year=${year}`,
-        );
-        numbers = unwrapApiPayload(response);
-    }
-
-    populateSelect(
-        sequenceSelect,
-        numbers.map((number) => ({
-            value: number,
-            label: number.toString().padStart(3, "0"),
-        })),
-    );
-}
-
 async function previewLetterNumber() {
     const letterCode = letterCodeInput?.value.trim();
     const departmentId = departmentSelect?.value;
-    const sequenceNumber = sequenceSelect?.value;
+    const sequenceNumber = sequenceInput?.value;
     const year = yearInput?.value;
 
     if (!letterCode || !departmentId || !sequenceNumber || !year) {
@@ -148,9 +117,7 @@ async function submitForm(event) {
     const data = {
         index_code: document.getElementById("index_code").value.trim(),
         letter_code: document.getElementById("letter_code").value.trim(),
-        sequence_number: Number(
-            document.getElementById("sequence_number").value,
-        ),
+        sequence_number: Number(sequenceInput.value),
         year: Number(document.getElementById("year").value),
         subject: document.getElementById("subject").value.trim(),
         summary: document.getElementById("summary").value.trim(),

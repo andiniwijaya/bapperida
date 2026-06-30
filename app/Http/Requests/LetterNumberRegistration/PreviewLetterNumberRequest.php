@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\LetterNumberRegistration;
 
+use App\Models\LetterNumberRegistration;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -17,7 +18,7 @@ class PreviewLetterNumberRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()?->can('create', \App\Models\LetterNumberRegistration::class) ?? false;
+        return $this->user()?->can('create', LetterNumberRegistration::class) ?? false;
     }
 
     /**
@@ -41,7 +42,7 @@ class PreviewLetterNumberRequest extends FormRequest
                     ->where('is_active', true),
             ],
             'sequence_number' => [
-                'nullable',
+                'required',
                 'integer',
                 'min:1',
             ],

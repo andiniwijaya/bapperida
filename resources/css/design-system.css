@@ -23,7 +23,7 @@
     --ds-table-header-bg: var(--color-ocean-500);
     --ds-table-header-text: #f8fafc;
     --ds-table-header-border: var(--color-ocean-400);
-    --ds-table-row-hover: rgba(232, 241, 248, 0.55);
+    --ds-table-row-hover: #eff6ff;
     --ds-table-cell-border: var(--color-charcoal-100);
 
     /* Surfaces */
@@ -95,7 +95,7 @@
     --ds-focus-ring: var(--color-gold-500);
     --ds-focus-ring-offset: var(--color-navy-900);
 
-    --ds-table-row-hover: rgba(10, 37, 64, 0.35);
+    --ds-table-row-hover: #1e293b;
     --ds-table-cell-border: var(--color-navy-700);
 
     --ds-success-bg: rgba(45, 118, 160, 0.2);

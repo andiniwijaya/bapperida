@@ -17,12 +17,20 @@ final class RegistrationCardPrint
 
     public const BACKGROUND_PINK = 'pink';
 
-    /** Landscape card: 163mm × 103mm in points. */
+    /** Landscape card width/height in millimetres. */
     public const CARD_WIDTH_MM = 163;
 
     public const CARD_HEIGHT_MM = 103;
 
-    public const CARD_PAPER = [0, 0, 461.386, 291.969];
+    /** Landscape card 163mm × 103mm in PDF points (1pt = 1/72 inch). */
+    public const CARD_PAPER = [0, 0, 462.047, 292.064];
+
+    /** Printed content inset from paper edge (matches physical card). */
+    public const CARD_MARGIN_MM = 4;
+
+    public const CARD_SIDEBAR_WIDTH_MM = 13;
+
+    public const CARD_SIDEBAR_GAP_MM = 2;
 
     /**
      * @return array<string, string>
@@ -85,5 +93,24 @@ final class RegistrationCardPrint
     public static function cardPaperSize(): array
     {
         return self::CARD_PAPER;
+    }
+
+    public static function cardInnerWidthMm(): int
+    {
+        return self::CARD_WIDTH_MM - (2 * self::CARD_MARGIN_MM);
+    }
+
+    public static function cardInnerHeightMm(): int
+    {
+        return self::CARD_HEIGHT_MM - (2 * self::CARD_MARGIN_MM);
+    }
+
+    public static function cardGridWidthMm(bool $isTemplate): int
+    {
+        if (! $isTemplate) {
+            return self::cardInnerWidthMm();
+        }
+
+        return self::cardInnerWidthMm() - self::CARD_SIDEBAR_WIDTH_MM - self::CARD_SIDEBAR_GAP_MM;
     }
 }
