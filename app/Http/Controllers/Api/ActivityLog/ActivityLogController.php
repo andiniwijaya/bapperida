@@ -9,6 +9,7 @@ use App\Models\ActivityLog;
 use App\Services\ActivityLog\ExportActivityLogExcelService;
 use App\Services\ActivityLog\ListActivityLogService;
 use App\Services\SystemSetting\SystemConfigurationService;
+use App\Support\TablePagination;
 use Illuminate\Http\JsonResponse;
 
 /**
@@ -91,7 +92,7 @@ class ActivityLogController extends ApiController
             'department_id' => $request->integer('department_id') ?: null,
             'period_start' => $request->string('period_start')->trim()->toString() ?: null,
             'period_end' => $request->string('period_end')->trim()->toString() ?: null,
-            'per_page' => $request->integer('per_page', 15),
+            'per_page' => TablePagination::resolve($request->integer('per_page') ?: null),
             'order' => $request->input('order'),
         ];
     }

@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Api;
 
 use App\Models\Report;
+use App\Support\TablePagination;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -51,7 +52,7 @@ class ReportRequest extends FormRequest
             'period_end' => ['nullable', 'date', 'after_or_equal:period_start'],
             'status' => ['nullable', 'string', Rule::in(['active', 'inactive'])],
             'letter_type' => ['nullable', 'string', Rule::in(array_keys(config('letter.types')))],
-            'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
+            'per_page' => TablePagination::rules(),
             'order' => ['nullable', 'string', Rule::in(['latest', 'oldest'])],
             'page' => ['nullable', 'integer', 'min:1'],
             'ids' => ['nullable', 'string'],

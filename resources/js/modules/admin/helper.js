@@ -268,6 +268,35 @@ export function paginationWindow(currentPage, lastPage, siblings = 2) {
     return pages;
 }
 
+/**
+ * @param {Record<string, unknown>|null|undefined} meta
+ * @param {unknown[]} [items]
+ * @returns {{ current_page: number, last_page: number, per_page: number, total: unknown }|null}
+ */
+export function normalizePaginationMeta(meta, items = []) {
+    if (!meta || typeof meta !== "object") {
+        return null;
+    }
+
+    const currentPage = Number(meta.current_page ?? meta.currentPage) || 1;
+    const perPage = Number(meta.per_page ?? meta.perPage) || 0;
+    const total = Number(meta.total);
+    let lastPage = Number(meta.last_page ?? meta.lastPage) || 0;
+
+    if (lastPage < 1 && Number.isFinite(total) && perPage > 0) {
+        lastPage = Math.max(1, Math.ceil(total / perPage));
+    }
+
+    return {
+        ...meta,
+        current_page: currentPage,
+        last_page: lastPage || 1,
+        per_page: perPage,
+        total: Number.isFinite(total) ? total : meta.total,
+        items_count: items.length,
+    };
+}
+
 export function renderPagination(meta, onPageChange) {
     const pagination = document.getElementById("pagination");
 
@@ -275,15 +304,18 @@ export function renderPagination(meta, onPageChange) {
         return;
     }
 
-    const currentPage = Number(meta?.current_page) || 1;
-    const lastPage = Number(meta?.last_page) || 1;
+    const normalized = normalizePaginationMeta(meta);
+    const currentPage = normalized?.current_page || 1;
+    const lastPage = normalized?.last_page || 1;
 
-    if (!meta || lastPage <= 1) {
+    if (!normalized || lastPage <= 1) {
         pagination.innerHTML = "";
         pagination.classList.add("hidden");
 
         return;
     }
+
+    pagination.classList.remove("hidden");
 
     const pageItems = paginationWindow(currentPage, lastPage)
         .map((page) => {
@@ -344,14 +376,24 @@ export function extractPaginatedItems(response) {
     if (Array.isArray(payload)) {
         return {
             items: payload,
-            meta: response?.meta ?? null,
+            meta: normalizePaginationMeta(response?.meta, payload),
         };
     }
 
     if (payload && Array.isArray(payload.data)) {
         return {
             items: payload.data,
-            meta: payload.meta ?? response?.meta ?? null,
+            meta: normalizePaginationMeta(payload.meta ?? response?.meta, payload.data),
+        };
+    }
+
+    if (payload?.data && Array.isArray(payload.data.data)) {
+        return {
+            items: payload.data.data,
+            meta: normalizePaginationMeta(
+                payload.meta ?? payload.data.meta ?? response?.meta,
+                payload.data.data,
+            ),
         };
     }
 
@@ -375,7 +417,7 @@ export function unwrapApiPayload(response) {
     return response;
 }
 
-export const DEFAULT_TABLE_PER_PAGE = 15;
+export const DEFAULT_TABLE_PER_PAGE = 10;
 export const DEFAULT_TABLE_ORDER = "latest";
 
 /**

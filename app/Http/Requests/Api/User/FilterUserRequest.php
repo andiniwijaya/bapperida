@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Api\User;
 
 use App\Models\User;
+use App\Support\TablePagination;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -23,7 +24,7 @@ class FilterUserRequest extends FormRequest
     {
         return [
             'search' => ['nullable', 'string', 'max:100'],
-            'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
+            'per_page' => TablePagination::rules(),
             'order' => ['nullable', 'string', Rule::in(['latest', 'oldest'])],
         ];
     }

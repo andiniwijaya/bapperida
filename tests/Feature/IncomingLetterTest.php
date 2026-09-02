@@ -256,11 +256,59 @@ class IncomingLetterTest extends TestCase
         ]);
 
         $response = $this->actingAs($user, 'sanctum')
-            ->getJson('/api/incoming-letters?search=FILTER&year=2026&department_id='.$departmentA->id.'&letter_attribute=public&status=active&per_page=1');
+            ->getJson('/api/incoming-letters?search=FILTER&year=2026&department_id='.$departmentA->id.'&letter_attribute=public&status=active&per_page=10');
 
         $response->assertOk()
             ->assertJsonPath('data.meta.total', 1)
             ->assertJsonPath('data.data.0.letter_number', 'FILTER/001');
+    }
+
+    public function test_index_splits_eleven_records_into_two_pages_when_showing_ten(): void
+    {
+        $user = User::factory()->create(['role' => 'staff']);
+        $department = Department::create([
+            'code' => 'DPT',
+            'name' => 'Departemen Test',
+            'is_active' => true,
+        ]);
+
+        for ($i = 1; $i <= 11; $i++) {
+            $this->createIncomingLetter($user, $department, [
+                'letter_number' => sprintf('PAGE/%03d/DPT/2026', $i),
+            ]);
+        }
+
+        $this->actingAs($user, 'sanctum')
+            ->getJson('/api/incoming-letters?per_page=10')
+            ->assertOk()
+            ->assertJsonPath('data.meta.total', 11)
+            ->assertJsonPath('data.meta.per_page', 10)
+            ->assertJsonPath('data.meta.last_page', 2)
+            ->assertJsonPath('data.meta.current_page', 1)
+            ->assertJsonCount(10, 'data.data');
+    }
+
+    public function test_index_defaults_to_ten_records_per_page(): void
+    {
+        $user = User::factory()->create(['role' => 'staff']);
+        $department = Department::create([
+            'code' => 'DPTD',
+            'name' => 'Departemen Default',
+            'is_active' => true,
+        ]);
+
+        for ($i = 1; $i <= 11; $i++) {
+            $this->createIncomingLetter($user, $department, [
+                'letter_number' => sprintf('DEFAULT/%03d/DPTD/2026', $i),
+            ]);
+        }
+
+        $this->actingAs($user, 'sanctum')
+            ->getJson('/api/incoming-letters')
+            ->assertOk()
+            ->assertJsonPath('data.meta.per_page', 10)
+            ->assertJsonPath('data.meta.last_page', 2)
+            ->assertJsonCount(10, 'data.data');
     }
 
     public function test_file_download_and_missing_file_error(): void
@@ -320,7 +368,7 @@ class IncomingLetterTest extends TestCase
         $response->assertHeaderContains('content-type', 'application/pdf');
 
         $response = $this->actingAs($user, 'sanctum')
-            ->getJson('/api/incoming-letters/export-excel?ids=' . $incomingLetter->id);
+            ->getJson('/api/incoming-letters/export-excel?ids='.$incomingLetter->id);
 
         $response->assertOk();
         $response->assertHeaderContains('content-type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');

@@ -4,6 +4,7 @@ namespace App\Services\ActivityLog;
 
 use App\Models\ActivityLog;
 use App\Support\ListOrder;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 /**
  * Paginated activity log listing with audit filters.
@@ -18,7 +19,7 @@ class ListActivityLogService
 {
     /**
      * @param  array<string, mixed>  $filters
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     * @return LengthAwarePaginator
      */
     public function handle(array $filters = [])
     {
@@ -65,6 +66,6 @@ class ListActivityLogService
 
         $query = ListOrder::apply($query, $filters['order'] ?? null, 'logged_at');
 
-        return $query->paginate($filters['per_page'] ?? 15);
+        return $query->paginate($filters['per_page'] ?? 10);
     }
 }

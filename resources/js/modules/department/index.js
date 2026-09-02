@@ -33,7 +33,7 @@ const tableControls = initTableControls({
         currentPage = 1;
         loadDepartments();
     },
-    perPage: 15,
+    perPage: 10,
 });
 
 searchInput?.addEventListener("input", () => {

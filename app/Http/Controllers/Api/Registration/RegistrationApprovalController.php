@@ -4,12 +4,13 @@ namespace App\Http\Controllers\Api\Registration;
 
 use App\Http\Controllers\Api\ApiController;
 use App\Http\Requests\Api\RegistrationRequest\FilterRegistrationRequest;
+use App\Http\Requests\Api\RegistrationRequest\RejectRegistrationRequest;
 use App\Http\Resources\RegistrationRequestResource;
 use App\Models\RegistrationRequest;
 use App\Services\Registration\ApproveRegistrationService;
 use App\Services\Registration\RejectRegistrationService;
-use App\Http\Requests\Api\RegistrationRequest\RejectRegistrationRequest;
 use App\Support\ListOrder;
+use App\Support\TablePagination;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 
@@ -18,8 +19,7 @@ class RegistrationApprovalController extends ApiController
     public function __construct(
         protected ApproveRegistrationService $approveService,
         protected RejectRegistrationService $rejectService,
-    ) {
-    }
+    ) {}
 
     /**
      * Menampilkan seluruh permintaan registrasi.
@@ -32,7 +32,7 @@ class RegistrationApprovalController extends ApiController
 
         $query = ListOrder::apply($query, $request->input('order'), 'created_at');
 
-        $requests = $query->paginate($request->integer('per_page', 15));
+        $requests = $query->paginate(TablePagination::resolve($request->integer('per_page') ?: null));
 
         return $this->success([
             'data' => RegistrationRequestResource::collection($requests),

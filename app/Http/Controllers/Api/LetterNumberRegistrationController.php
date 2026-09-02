@@ -16,6 +16,7 @@ use App\Services\LetterNumberRegistration\RestoreLetterNumberRegistrationService
 use App\Services\LetterNumberRegistration\StoreLetterNumberRegistrationService;
 use App\Services\LetterNumberRegistration\UpdateLetterNumberRegistrationService;
 use App\Services\SystemSetting\SystemConfigurationService;
+use App\Support\TablePagination;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -48,7 +49,7 @@ class LetterNumberRegistrationController extends ApiController
             'department_id' => $request->integer('department_id') ?: null,
             'letter_type' => $request->string('letter_type')->trim()->toString() ?: null,
             'status' => $request->string('status')->trim()->toString() ?: null,
-            'per_page' => $request->integer('per_page', 10),
+            'per_page' => TablePagination::resolve($request->integer('per_page') ?: null),
             'order' => $request->input('order'),
         ]);
 

@@ -18,7 +18,7 @@
                 <label class="flex items-center gap-2 text-sm text-charcoal-600 dark:text-slate-400">
                     <span>Tampilkan</span>
                     <select id="table-per-page" class="app-table-toolbar__select">
-                        <option value="10">10</option>
+                        <option value="10" selected>10</option>
                         <option value="25">25</option>
                         <option value="50">50</option>
                         <option value="100">100</option>

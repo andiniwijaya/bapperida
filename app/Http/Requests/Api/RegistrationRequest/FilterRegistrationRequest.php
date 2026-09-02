@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Api\RegistrationRequest;
 
 use App\Models\RegistrationRequest;
+use App\Support\TablePagination;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -22,7 +23,7 @@ class FilterRegistrationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
+            'per_page' => TablePagination::rules(),
             'order' => ['nullable', 'string', Rule::in(['latest', 'oldest'])],
         ];
     }

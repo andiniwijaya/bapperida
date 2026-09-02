@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests\IncomingLetter;
 
+use App\Models\IncomingLetter;
+use App\Support\TablePagination;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -17,7 +19,7 @@ class FilterIncomingLetterRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()?->can('viewAny', \App\Models\IncomingLetter::class) ?? false;
+        return $this->user()?->can('viewAny', IncomingLetter::class) ?? false;
     }
 
     /**
@@ -31,7 +33,7 @@ class FilterIncomingLetterRequest extends FormRequest
             'department_id' => ['nullable', 'integer', 'exists:departments,id'],
             'letter_attribute' => ['nullable', 'string'],
             'status' => ['nullable', 'string'],
-            'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
+            'per_page' => TablePagination::rules(),
             'order' => ['nullable', 'string', Rule::in(['latest', 'oldest'])],
         ];
     }

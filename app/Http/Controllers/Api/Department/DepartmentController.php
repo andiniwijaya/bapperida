@@ -8,11 +8,12 @@ use App\Http\Requests\Api\Department\StoreDepartmentRequest;
 use App\Http\Requests\Api\Department\UpdateDepartmentRequest;
 use App\Http\Resources\DepartmentResource;
 use App\Models\Department;
-use App\Support\ListOrder;
 use App\Services\Department\DeleteDepartmentService;
 use App\Services\Department\RestoreDepartmentService;
 use App\Services\Department\StoreDepartmentService;
 use App\Services\Department\UpdateDepartmentService;
+use App\Support\ListOrder;
+use App\Support\TablePagination;
 use Illuminate\Http\JsonResponse;
 
 /**
@@ -61,7 +62,7 @@ class DepartmentController extends ApiController
 
         $query = ListOrder::apply($query, $request->input('order'), 'created_at');
 
-        $departments = $query->paginate($request->integer('per_page') ?: 15);
+        $departments = $query->paginate(TablePagination::resolve($request->integer('per_page') ?: null));
 
         return $this->success([
             'data' => DepartmentResource::collection($departments),

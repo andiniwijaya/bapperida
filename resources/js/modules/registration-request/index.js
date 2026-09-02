@@ -29,7 +29,7 @@ const tableControls = initTableControls({
         currentPage = 1;
         loadRequests();
     },
-    perPage: 15,
+    perPage: 10,
 });
 
 async function loadRequests(page = 1) {

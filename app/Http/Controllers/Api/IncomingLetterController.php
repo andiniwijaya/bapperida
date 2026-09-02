@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Api\ApiController;
 use App\Http\Requests\IncomingLetter\FilterIncomingLetterRequest;
 use App\Http\Requests\IncomingLetter\StoreIncomingLetterRequest;
 use App\Http\Requests\IncomingLetter\UpdateIncomingLetterRequest;
@@ -17,6 +16,7 @@ use App\Services\IncomingLetter\ListIncomingLetterService;
 use App\Services\IncomingLetter\RestoreIncomingLetterService;
 use App\Services\IncomingLetter\StoreIncomingLetterService;
 use App\Services\IncomingLetter\UpdateIncomingLetterService;
+use App\Support\TablePagination;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -33,7 +33,7 @@ class IncomingLetterController extends ApiController
             'department_id' => $request->integer('department_id') ?: null,
             'letter_attribute' => $request->string('letter_attribute')->trim()->toString() ?: null,
             'status' => $request->string('status')->trim()->toString() ?: null,
-            'per_page' => $request->integer('per_page', 10),
+            'per_page' => TablePagination::resolve($request->integer('per_page') ?: null),
             'order' => $request->input('order'),
         ]);
 

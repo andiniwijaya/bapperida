@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests\ActivityLog;
 
+use App\Models\ActivityLog;
+use App\Support\TablePagination;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -20,7 +22,7 @@ class FilterActivityLogRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()?->can('viewAny', \App\Models\ActivityLog::class) ?? false;
+        return $this->user()?->can('viewAny', ActivityLog::class) ?? false;
     }
 
     /**
@@ -37,7 +39,7 @@ class FilterActivityLogRequest extends FormRequest
             'department_id' => ['nullable', 'integer', 'exists:departments,id'],
             'period_start' => ['nullable', 'date'],
             'period_end' => ['nullable', 'date', 'after_or_equal:period_start'],
-            'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
+            'per_page' => TablePagination::rules(),
             'order' => ['nullable', 'string', Rule::in(['latest', 'oldest'])],
         ];
     }

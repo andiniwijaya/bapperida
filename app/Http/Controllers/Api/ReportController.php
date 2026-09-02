@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Api\ApiController;
 use App\Http\Requests\Api\ReportRequest;
 use App\Http\Requests\Api\ReportStatisticsRequest;
 use App\Models\Report;
@@ -10,6 +9,7 @@ use App\Services\Report\ExportReportExcelService;
 use App\Services\Report\ListReportService;
 use App\Services\Report\ReportFilterService;
 use App\Services\Report\ReportStatisticsService;
+use App\Support\TablePagination;
 use Illuminate\Http\JsonResponse;
 
 /**
@@ -128,7 +128,7 @@ class ReportController extends ApiController
             'period_end' => $request->string('period_end')->trim()->toString() ?: null,
             'status' => $request->string('status')->trim()->toString() ?: null,
             'letter_type' => $request->string('letter_type')->trim()->toString() ?: null,
-            'per_page' => $request->integer('per_page', 10),
+            'per_page' => TablePagination::resolve($request->integer('per_page') ?: null),
             'page' => $request->integer('page', 1),
             'order' => $request->input('order'),
         ];

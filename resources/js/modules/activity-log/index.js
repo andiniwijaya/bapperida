@@ -39,7 +39,7 @@ const tableControls = initTableControls({
         currentPage = 1;
         loadActivityLogs();
     },
-    perPage: 15,
+    perPage: 10,
 });
 
 function bindFilter(input, key) {

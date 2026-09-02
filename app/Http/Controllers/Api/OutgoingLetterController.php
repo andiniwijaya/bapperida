@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Api\ApiController;
 use App\Http\Requests\OutgoingLetter\FilterOutgoingLetterRequest;
 use App\Http\Requests\OutgoingLetter\StoreOutgoingLetterRequest;
 use App\Http\Requests\OutgoingLetter\UpdateOutgoingLetterRequest;
@@ -18,8 +17,12 @@ use App\Services\OutgoingLetter\ListOutgoingLetterService;
 use App\Services\OutgoingLetter\RestoreOutgoingLetterService;
 use App\Services\OutgoingLetter\StoreOutgoingLetterService;
 use App\Services\OutgoingLetter\UpdateOutgoingLetterService;
+use App\Support\TablePagination;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 /**
  * API for outgoing letter archives (arsip surat keluar).
@@ -51,7 +54,7 @@ class OutgoingLetterController extends ApiController
             'department_id' => $request->integer('department_id') ?: null,
             'letter_type' => $request->string('letter_type')->trim()->toString() ?: null,
             'status' => $request->string('status')->trim()->toString() ?: null,
-            'per_page' => $request->integer('per_page', 10),
+            'per_page' => TablePagination::resolve($request->integer('per_page') ?: null),
             'order' => $request->input('order'),
         ]);
 
@@ -256,7 +259,7 @@ class OutgoingLetterController extends ApiController
      *
      * @param  OutgoingLetter  $outgoingLetter  Target record.
      * @param  DownloadOutgoingLetterFileService  $service  Secure download with audit trail.
-     * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
+     * @return BinaryFileResponse
      */
     public function downloadFile(OutgoingLetter $outgoingLetter, DownloadOutgoingLetterFileService $service)
     {
@@ -271,7 +274,7 @@ class OutgoingLetterController extends ApiController
      * HTML print preview for selected or filtered outgoing letters.
      *
      * @param  Request  $request  ids comma-list or same filters as index.
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function print(Request $request)
     {
@@ -293,10 +296,10 @@ class OutgoingLetterController extends ApiController
                         ->orWhere('recipient', 'like', "%{$search}%");
                 });
             })
-            ->when($request->integer('year') ?: null, fn ($q, $year) => $q->whereHas('registration', fn ($query) => $query->where('year', $year)))
-            ->when($request->integer('department_id') ?: null, fn ($q, $department) => $q->whereHas('registration', fn ($query) => $query->where('department_id', $department)))
-            ->when($request->string('letter_type')->trim()->toString() ?: null, fn ($q, $type) => $q->where('letter_type', $type))
-            ->when($request->string('status')->trim()->toString() ?: null, fn ($q, $status) => $q->where('status', $status));
+                ->when($request->integer('year') ?: null, fn ($q, $year) => $q->whereHas('registration', fn ($query) => $query->where('year', $year)))
+                ->when($request->integer('department_id') ?: null, fn ($q, $department) => $q->whereHas('registration', fn ($query) => $query->where('department_id', $department)))
+                ->when($request->string('letter_type')->trim()->toString() ?: null, fn ($q, $type) => $q->where('letter_type', $type))
+                ->when($request->string('status')->trim()->toString() ?: null, fn ($q, $status) => $q->where('status', $status));
         }
 
         $outgoingLetters = $query->get();
@@ -312,7 +315,7 @@ class OutgoingLetterController extends ApiController
      *
      * @param  Request  $request  ids or filter query params.
      * @param  ExportOutgoingLetterPdfService  $service  PDF renderer.
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function exportPdf(Request $request, ExportOutgoingLetterPdfService $service)
     {
@@ -334,10 +337,10 @@ class OutgoingLetterController extends ApiController
                         ->orWhere('recipient', 'like', "%{$search}%");
                 });
             })
-            ->when($request->integer('year') ?: null, fn ($q, $year) => $q->whereHas('registration', fn ($query) => $query->where('year', $year)))
-            ->when($request->integer('department_id') ?: null, fn ($q, $department) => $q->whereHas('registration', fn ($query) => $query->where('department_id', $department)))
-            ->when($request->string('letter_type')->trim()->toString() ?: null, fn ($q, $type) => $q->where('letter_type', $type))
-            ->when($request->string('status')->trim()->toString() ?: null, fn ($q, $status) => $q->where('status', $status));
+                ->when($request->integer('year') ?: null, fn ($q, $year) => $q->whereHas('registration', fn ($query) => $query->where('year', $year)))
+                ->when($request->integer('department_id') ?: null, fn ($q, $department) => $q->whereHas('registration', fn ($query) => $query->where('department_id', $department)))
+                ->when($request->string('letter_type')->trim()->toString() ?: null, fn ($q, $type) => $q->where('letter_type', $type))
+                ->when($request->string('status')->trim()->toString() ?: null, fn ($q, $status) => $q->where('status', $status));
         }
 
         return $service->handle($query->get());
@@ -348,7 +351,7 @@ class OutgoingLetterController extends ApiController
      *
      * @param  Request  $request  ids or filter query params.
      * @param  ExportOutgoingLetterExcelService  $service  Spreadsheet builder.
-     * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
+     * @return BinaryFileResponse
      */
     public function exportExcel(Request $request, ExportOutgoingLetterExcelService $service)
     {
@@ -370,10 +373,10 @@ class OutgoingLetterController extends ApiController
                         ->orWhere('recipient', 'like', "%{$search}%");
                 });
             })
-            ->when($request->integer('year') ?: null, fn ($q, $year) => $q->whereHas('registration', fn ($query) => $query->where('year', $year)))
-            ->when($request->integer('department_id') ?: null, fn ($q, $department) => $q->whereHas('registration', fn ($query) => $query->where('department_id', $department)))
-            ->when($request->string('letter_type')->trim()->toString() ?: null, fn ($q, $type) => $q->where('letter_type', $type))
-            ->when($request->string('status')->trim()->toString() ?: null, fn ($q, $status) => $q->where('status', $status));
+                ->when($request->integer('year') ?: null, fn ($q, $year) => $q->whereHas('registration', fn ($query) => $query->where('year', $year)))
+                ->when($request->integer('department_id') ?: null, fn ($q, $department) => $q->whereHas('registration', fn ($query) => $query->where('department_id', $department)))
+                ->when($request->string('letter_type')->trim()->toString() ?: null, fn ($q, $type) => $q->where('letter_type', $type))
+                ->when($request->string('status')->trim()->toString() ?: null, fn ($q, $status) => $q->where('status', $status));
         }
 
         return $service->handle($query->get());

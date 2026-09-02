@@ -5,14 +5,13 @@ namespace App\Http\Controllers\Api\User;
 use App\Http\Controllers\Api\ApiController;
 use App\Http\Requests\Api\User\ChangeRoleRequest;
 use App\Http\Requests\Api\User\ChangeStatusRequest;
+use App\Http\Requests\Api\User\FilterUserRequest;
 use App\Http\Requests\Api\User\ResendPasswordSetupRequest;
 use App\Http\Requests\Api\User\ResetPasswordRequest;
 use App\Http\Requests\Api\User\StoreUserRequest;
 use App\Http\Requests\Api\User\UpdateUserRequest;
-use App\Http\Requests\Api\User\FilterUserRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
-use App\Support\ListOrder;
 use App\Services\User\ChangeUserRoleService;
 use App\Services\User\ChangeUserStatusService;
 use App\Services\User\DeleteUserService;
@@ -21,6 +20,8 @@ use App\Services\User\ResetUserPasswordService;
 use App\Services\User\RestoreUserService;
 use App\Services\User\StoreUserService;
 use App\Services\User\UpdateUserService;
+use App\Support\ListOrder;
+use App\Support\TablePagination;
 use Illuminate\Http\JsonResponse;
 
 /**
@@ -72,7 +73,7 @@ class UserController extends ApiController
 
         $query = ListOrder::apply($query, $request->input('order'), 'created_at');
 
-        $paginated = $query->paginate($request->integer('per_page', 15));
+        $paginated = $query->paginate(TablePagination::resolve($request->integer('per_page') ?: null));
 
         return $this->success([
             'data' => UserResource::collection($paginated),

@@ -45,7 +45,7 @@ class DepartmentManagementTest extends TestCase
         Department::factory()->create(['code' => 'BBB', 'name' => 'Beta Bidang']);
 
         $response = $this->actingAs($superadmin, 'sanctum')
-            ->getJson('/api/departments?search=Alpha&per_page=1');
+            ->getJson('/api/departments?search=Alpha&per_page=10');
 
         $response->assertOk()
             ->assertJsonPath('success', true)

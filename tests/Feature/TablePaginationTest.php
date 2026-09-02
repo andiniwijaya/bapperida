@@ -58,6 +58,7 @@ class TablePaginationTest extends TestCase
 
             $this->assertStringContainsString('id="pagination"', $html);
             $this->assertStringContainsString('id="table-per-page"', $html);
+            $this->assertStringContainsString('value="10" selected', $html);
             $this->assertStringContainsString('>10</option>', $html);
             $this->assertStringContainsString('>25</option>', $html);
             $this->assertStringContainsString('>50</option>', $html);
@@ -72,12 +73,16 @@ class TablePaginationTest extends TestCase
 
         $this->assertIsString($helper);
         $this->assertIsString($skeleton);
+        $this->assertStringContainsString('export const DEFAULT_TABLE_PER_PAGE = 10', $helper);
+        $this->assertStringNotContainsString('perPage: 15', $helper);
+        $this->assertStringNotContainsString('DEFAULT_TABLE_PER_PAGE = 15', $helper);
         $this->assertStringContainsString('export function paginationWindow', $helper);
         $this->assertStringContainsString('Halaman sebelumnya', $helper);
         $this->assertStringContainsString('Halaman berikutnya', $helper);
         $this->assertStringContainsString('>&lt;</button>', $helper);
         $this->assertStringContainsString('>&gt;</button>', $helper);
         $this->assertStringContainsString('class="ds-pagination"', $helper);
+        $this->assertStringContainsString('pagination.classList.remove("hidden")', $helper);
         $this->assertStringContainsString('pagination.classList.remove("hidden")', $skeleton);
     }
 }
