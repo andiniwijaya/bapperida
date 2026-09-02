@@ -4,47 +4,38 @@
 ])
 
 @if (is_object($paginator) && method_exists($paginator, 'hasPages') && $paginator->hasPages())
-    <nav class="flex items-center justify-between {{ $class }}" aria-label="Navigasi halaman">
-        <div class="flex-1">
-            @if ($paginator->onFirstPage())
-                <span class="ds-pagination__link is-disabled cursor-not-allowed px-4 py-2">
-                    ← Sebelumnya
-                </span>
-            @else
-                <a href="{{ $paginator->previousPageUrl() }}" class="ds-pagination__link px-4 py-2">
-                    ← Sebelumnya
-                </a>
-            @endif
-        </div>
+    @php
+        $pages = \App\Support\PaginationWindow::items(
+            $paginator->currentPage(),
+            $paginator->lastPage(),
+        );
+    @endphp
 
-        <div class="flex items-center gap-1">
-            @foreach ($paginator->getUrlRange(max(1, $paginator->currentPage() - 2), min($paginator->lastPage(), $paginator->currentPage() + 2)) as $page => $url)
-                @if ($page == $paginator->currentPage())
-                    <span class="ds-pagination__page is-active">
-                        {{ $page }}
-                    </span>
-                @else
-                    <a href="{{ $url }}" class="ds-pagination__page">
-                        {{ $page }}
-                    </a>
-                @endif
-            @endforeach
-        </div>
+    <nav {{ $attributes->class(['ds-pagination', $class]) }} aria-label="Navigasi halaman">
+        @if ($paginator->onFirstPage())
+            <span class="ds-pagination__page is-disabled" aria-disabled="true" aria-label="Halaman sebelumnya">&lt;</span>
+        @else
+            <a href="{{ $paginator->previousPageUrl() }}" class="ds-pagination__page" aria-label="Halaman sebelumnya">&lt;</a>
+        @endif
 
-        <div class="flex-1 text-right">
-            @if ($paginator->hasMorePages())
-                <a href="{{ $paginator->nextPageUrl() }}" class="ds-pagination__link px-4 py-2">
-                    Berikutnya →
-                </a>
+        @foreach ($pages as $page)
+            @if ($page === 'ellipsis')
+                <span class="ds-pagination__ellipsis" aria-hidden="true">&hellip;</span>
+            @elseif ($page == $paginator->currentPage())
+                <span class="ds-pagination__page is-active" aria-current="page">{{ $page }}</span>
             @else
-                <span class="ds-pagination__link is-disabled cursor-not-allowed px-4 py-2">
-                    Berikutnya →
-                </span>
+                <a href="{{ $paginator->url($page) }}" class="ds-pagination__page">{{ $page }}</a>
             @endif
-        </div>
+        @endforeach
+
+        @if ($paginator->hasMorePages())
+            <a href="{{ $paginator->nextPageUrl() }}" class="ds-pagination__page" aria-label="Halaman berikutnya">&gt;</a>
+        @else
+            <span class="ds-pagination__page is-disabled" aria-disabled="true" aria-label="Halaman berikutnya">&gt;</span>
+        @endif
     </nav>
 @else
-    <nav class="flex items-center justify-between {{ $class }}" aria-label="Navigasi halaman">
+    <nav {{ $attributes->class(['ds-pagination', $class]) }} aria-label="Navigasi halaman">
         <span class="ds-caption">Navigasi halaman</span>
     </nav>
 @endif

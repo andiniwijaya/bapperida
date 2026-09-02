@@ -176,5 +176,9 @@ export function setLoadingState(isLoading, tableBodyId = null, options = {}) {
 
         tableWrapper?.classList.remove("hidden");
         tablePanel?.setAttribute("aria-busy", "false");
+
+        if (pagination && pagination.innerHTML.trim() !== "") {
+            pagination.classList.remove("hidden");
+        }
     }
 }

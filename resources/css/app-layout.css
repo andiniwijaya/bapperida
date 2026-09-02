@@ -1002,6 +1002,10 @@
     padding-right: 0;
 }
 
+.crud-table-panel #pagination {
+    text-align: center;
+}
+
 .crud-table-panel #emptyState {
     border-top-width: 0;
 }

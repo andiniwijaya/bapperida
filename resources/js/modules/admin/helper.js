@@ -224,6 +224,50 @@ export function dsBadgeClass(variant) {
     return DS_BADGE[variant] ?? DS_BADGE.neutral;
 }
 
+/**
+ * @param {number} currentPage
+ * @param {number} lastPage
+ * @param {number} [siblings]
+ * @returns {Array<number|'ellipsis'>}
+ */
+export function paginationWindow(currentPage, lastPage, siblings = 2) {
+    if (lastPage < 1) {
+        return [];
+    }
+
+    const current = Math.min(Math.max(currentPage, 1), lastPage);
+
+    if (lastPage <= 7) {
+        return Array.from({ length: lastPage }, (_, index) => index + 1);
+    }
+
+    const start = Math.max(1, current - siblings);
+    const end = Math.min(lastPage, current + siblings);
+    const pages = [];
+
+    if (start > 1) {
+        pages.push(1);
+
+        if (start > 2) {
+            pages.push("ellipsis");
+        }
+    }
+
+    for (let page = start; page <= end; page += 1) {
+        pages.push(page);
+    }
+
+    if (end < lastPage) {
+        if (end < lastPage - 1) {
+            pages.push("ellipsis");
+        }
+
+        pages.push(lastPage);
+    }
+
+    return pages;
+}
+
 export function renderPagination(meta, onPageChange) {
     const pagination = document.getElementById("pagination");
 
@@ -231,28 +275,64 @@ export function renderPagination(meta, onPageChange) {
         return;
     }
 
-    if (!meta || meta.last_page <= 1) {
+    const currentPage = Number(meta?.current_page) || 1;
+    const lastPage = Number(meta?.last_page) || 1;
+
+    if (!meta || lastPage <= 1) {
         pagination.innerHTML = "";
+        pagination.classList.add("hidden");
 
         return;
     }
 
-    const buttons = [];
+    const pageItems = paginationWindow(currentPage, lastPage)
+        .map((page) => {
+            if (page === "ellipsis") {
+                return `<span class="ds-pagination__ellipsis" aria-hidden="true">&hellip;</span>`;
+            }
 
-    for (let page = 1; page <= meta.last_page; page += 1) {
-        buttons.push(`
-            <button type="button" data-page="${page}" class="ds-pagination__page ${page === meta.current_page ? "is-active" : ""}">${page}</button>
-        `);
-    }
+            const isActive = page === currentPage;
+
+            return `
+                <button
+                    type="button"
+                    data-page="${page}"
+                    class="ds-pagination__page ${isActive ? "is-active" : ""}"
+                    ${isActive ? 'aria-current="page"' : ""}
+                >${page}</button>
+            `;
+        })
+        .join("");
+
+    const prevDisabled = currentPage <= 1;
+    const nextDisabled = currentPage >= lastPage;
 
     pagination.innerHTML = `
-        <div class="flex flex-wrap items-center justify-center gap-2">
-            ${buttons.join("")}
-        </div>
+        <nav class="ds-pagination" aria-label="Navigasi halaman">
+            <button
+                type="button"
+                data-page="${currentPage - 1}"
+                class="ds-pagination__page ${prevDisabled ? "is-disabled" : ""}"
+                ${prevDisabled ? "disabled" : ""}
+                aria-label="Halaman sebelumnya"
+            >&lt;</button>
+            ${pageItems}
+            <button
+                type="button"
+                data-page="${currentPage + 1}"
+                class="ds-pagination__page ${nextDisabled ? "is-disabled" : ""}"
+                ${nextDisabled ? "disabled" : ""}
+                aria-label="Halaman berikutnya"
+            >&gt;</button>
+        </nav>
     `;
 
     pagination.querySelectorAll("button[data-page]").forEach((button) => {
         button.addEventListener("click", () => {
+            if (button.disabled) {
+                return;
+            }
+
             onPageChange(Number(button.dataset.page));
         });
     });
