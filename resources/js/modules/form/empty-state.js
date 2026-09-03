@@ -276,6 +276,28 @@ function applyEmptyStatePreset(root, preset) {
 
 /**
  * @param {HTMLElement | null | undefined} root
+ * @param {boolean} visible
+ */
+function setEmptyStateVisibility(root, visible) {
+    if (!root) {
+        return;
+    }
+
+    root.classList.toggle("hidden", !visible);
+
+    if (visible) {
+        root.removeAttribute("hidden");
+        root.setAttribute("aria-hidden", "false");
+
+        return;
+    }
+
+    root.setAttribute("hidden", "");
+    root.setAttribute("aria-hidden", "true");
+}
+
+/**
+ * @param {HTMLElement | null | undefined} root
  * @param {string} context
  */
 export function renderTableEmptyState(root, context) {
@@ -286,7 +308,7 @@ export function renderTableEmptyState(root, context) {
     const pageKey = root.dataset.emptyPage;
 
     if (!pageKey || !EMPTY_PAGE_PRESETS[pageKey]) {
-        root.classList.remove("hidden");
+        setEmptyStateVisibility(root, true);
 
         return;
     }
@@ -294,14 +316,14 @@ export function renderTableEmptyState(root, context) {
     const preset = EMPTY_PAGE_PRESETS[pageKey][context] ?? EMPTY_PAGE_PRESETS[pageKey].table;
 
     applyEmptyStatePreset(root, preset);
-    root.classList.remove("hidden");
+    setEmptyStateVisibility(root, true);
 }
 
 /**
  * @param {HTMLElement | null | undefined} root
  */
 export function hideEmptyState(root) {
-    root?.classList.add("hidden");
+    setEmptyStateVisibility(root, false);
 }
 
 /**

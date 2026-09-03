@@ -3,11 +3,15 @@
     'title' => null,
     'description' => null,
     'page' => null,
-    'class' => '',
 ])
 
+@php
+    $isHidden = $attributes->has('hidden')
+        || str_contains((string) $attributes->get('class'), 'hidden');
+@endphp
+
 <div
-    {{ $attributes->class(['ds-empty-state']) }}
+    {{ $attributes->class(['ds-empty-state'])->merge($isHidden ? ['hidden' => true, 'aria-hidden' => 'true'] : []) }}
     @if ($page) data-empty-page="{{ $page }}" @endif
     data-empty-state-root
 >

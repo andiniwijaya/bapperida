@@ -2,6 +2,8 @@
  * Design-system skeleton builders and table loading state helpers.
  */
 
+import { hideEmptyState } from "./empty-state";
+
 /**
  * @param {number} widthPercent
  */
@@ -165,7 +167,7 @@ export function setLoadingState(isLoading, tableBodyId = null, options = {}) {
         }
 
         tableWrapper?.classList.add("hidden");
-        emptyState?.classList.add("hidden");
+        hideEmptyState(emptyState);
         pagination?.classList.add("hidden");
         tablePanel?.setAttribute("aria-busy", "true");
     } else {

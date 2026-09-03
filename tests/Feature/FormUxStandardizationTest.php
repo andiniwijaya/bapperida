@@ -109,4 +109,14 @@ class FormUxStandardizationTest extends TestCase
         $this->assertStringContainsString('data-empty-state-title', $html);
         $this->assertStringContainsString('data-lucide="inbox"', $html);
     }
+
+    public function test_empty_state_hidden_class_reaches_the_root_element(): void
+    {
+        $html = Blade::render('<x-empty-state id="emptyState" class="hidden" title="Kosong" />');
+
+        $this->assertMatchesRegularExpression('/\bclass="[^"]*\bhidden\b[^"]*"/', $html);
+        $this->assertMatchesRegularExpression('/\shidden(="[^"]*")?(?=[\s>])/', $html);
+        $this->assertStringContainsString('ds-empty-state', $html);
+        $this->assertStringContainsString('id="emptyState"', $html);
+    }
 }
